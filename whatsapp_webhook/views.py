@@ -28,7 +28,21 @@ def whatsapp_webhook(request):
         return handle_webhook_verification(request)
     
     # Handle POST request (incoming messages)
-    return handle_webhook_event(request)
+    logger.info("🎯 RECEIVED WHATSAPP MESSAGE!")
+    logger.info(f"📦 Raw body: {request.body.decode('utf-8', errors='replace')}")
+    
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        logger.info(f"📨 Parsed data: {json.dumps(data, indent=2, ensure_ascii=False)}")
+        
+        # Process the webhook event
+        response = handle_webhook_event(request)
+        logger.info(f"✅ Successfully processed message. Response: {response.status_code}")
+        return response
+        
+    except Exception as e:
+        logger.error(f"❌ Error processing webhook: {str(e)}", exc_info=True)
+        return HttpResponse('Server Error', status=500)
 
 def handle_webhook_verification(request):
     """Handle webhook verification request"""
