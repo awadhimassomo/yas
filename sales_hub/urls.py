@@ -11,6 +11,9 @@ urlpatterns = [
     path('', login_required(views.dashboard), name='dashboard'),
     
     # Customer-related URLs
+    path('customers/', 
+         login_required(views.customer_list), 
+         name='customer_list'),
     path('customers/<int:customer_id>/', 
          login_required(views.customer_detail), 
          name='customer_detail'),

@@ -23,15 +23,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-u*vgrj%wh42$ee+npr)$hga^&+#v&144i672kp)7#@vq1jn#6s'
 
 # WhatsApp Business API Configuration
-WHATSAPP_VERIFY_TOKEN = 'your_whatsapp_verify_token'  # Replace with your token
-WHATSAPP_APP_SECRET = 'your_whatsapp_app_secret'  # Replace with your app secret from Meta
-WHATSAPP_PHONE_NUMBER_ID = 'your_phone_number_id'  # Your WhatsApp Business Account Phone Number ID
-WHATSAPP_ACCESS_TOKEN = 'your_whatsapp_access_token'  # Your WhatsApp Business API access token
+WHATSAPP_VERIFY_TOKEN = 'yasbluerock_webhook_2024'  # Webhook verification token
+WHATSAPP_APP_SECRET = '436f83138eaf9976788fc3d1e7f9773b'  # Your WhatsApp App Secret from Meta (keep this secret!)
+WHATSAPP_PHONE_NUMBER_ID = '725773017276883'  # Your WhatsApp Business Account Phone Number ID
+WHATSAPP_ACCESS_TOKEN = 'EAALo7o1MHcUBPpbsgp8OPihu5cp4ODWpjOwTwNwuCukFbVKrZCO9VBMhxnwMplrIrAlECu9ddgwc9l2uSzdGfeylNDHkEFJ3qw8lbpV7t0pGT6vwztbFsIKiseNzYPwioZCpGz2XrVciuYF4wvCwo5jFS8aQhpPmObbIF3UIEQjfh2vvkhJdYK2w2S6M2pdKD1kDT0OO0AbytueqJbY0EtKbZCDZCZBUAC7TL3093LUS4cZAZARgS00GVfB4ZB3OfwZDZD'  # Your WhatsApp Business API access token (keep this secret!)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # For development only. In production, specify your domain.
+# Security settings
+ALLOWED_HOSTS = ['www.yasbluerock.shop', 'yasbluerock.shop', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://www.yasbluerock.shop', 'https://yasbluerock.shop']
 
 
 # Application definition
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'sales_hub.apps.SalesHubConfig',
     'whatsapp_webhook',
+    'public_site',
 ]
 
 MIDDLEWARE = [
@@ -59,10 +62,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'bluerock.urls'
 
+import os
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

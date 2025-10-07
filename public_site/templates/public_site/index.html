@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAS Bluerock - Customer Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        /* YAS Brand Colors - Yellow as Main Color */
+        :root {
+            --e-global-color-primary: #ffd100;
+            --e-global-color-secondary: #00377d;
+            --e-global-color-text: #4d73a4;
+            --e-global-color-accent: #fffdda;
+            --e-global-color-f5ccaed: #5f99d2;
+            --e-global-color-94587a8: #fff;
+            --e-global-color-9c2a4d1: #fffdf2;
+            --e-global-color-3483425: #00377d;
+            --e-global-color-cc3131e: #f2f5f9;
+            --e-global-color-5fca666: #f6f9fe;
+            --e-global-color-4b0f794: #1c57cf;
+            --e-global-color-1c6dfba: #000;
+            --e-global-color-4f947fa: #818181;
+            
+            /* Typography */
+            --e-global-typography-primary-font-family: "Figtree";
+            --e-global-typography-primary-font-weight: 800;
+            --e-global-typography-primary-font-style: italic;
+            --e-global-typography-secondary-font-family: "Figtree";
+            --e-global-typography-secondary-font-weight: 700;
+            --e-global-typography-text-font-family: "Figtree";
+            --e-global-typography-text-font-size: 18px;
+            --e-global-typography-text-font-weight: 400;
+            --e-global-typography-text-line-height: 1.3em;
+            --e-global-typography-accent-font-family: "Figtree";
+            --e-global-typography-accent-font-weight: 500;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--e-global-typography-text-font-family);
+        }
+
+        body {
+            background: var(--e-global-color-94587a8);
+            color: var(--e-global-color-text);
+            font-family: var(--e-global-typography-text-font-family);
+            font-size: var(--e-global-typography-text-font-size);
+            font-weight: 400;
+            line-height: 1.3em;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: var(--e-global-color-primary);
+            border-bottom: 1px solid rgba(0, 55, 125, 0.1);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            font-family: var(--e-global-typography-primary-font-family);
+            font-weight: var(--e-global-typography-primary-font-weight);
+            font-style: var(--e-global-typography-primary-font-style);
+            font-size: 28px;
+            color: var(--e-global-color-secondary);
+            text-decoration: none;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-link {
+            color: var(--e-global-color-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            font-family: var(--e-global-typography-accent-font-family);
+        }
+
+        .nav-link:hover {
+            color: var(--e-global-color-94587a8);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .login-btn {
+            background: var(--e-global-color-secondary);
+            color: var(--e-global-color-primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: var(--e-global-typography-accent-font-family);
+        }
+
+        .login-btn:hover {
+            background: var(--e-global-color-4b0f794);
+            color: var(--e-global-color-94587a8);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--e-global-color-primary) 0%, var(--e-global-color-accent) 100%);
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.05"><polygon fill="%2300377d" points="0,1000 1000,0 1000,1000"/></svg>');
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: var(--e-global-typography-secondary-font-family);
+            font-weight: var(--e-global-typography-secondary-font-weight);
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: var(--e-global-color-secondary);
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            color: var(--e-global-color-secondary);
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        /* Queue Section - Hidden by default */
+        .queue-section {
+            display: none;
+            background: var(--e-global-color-secondary);
+            color: var(--e-global-color-primary);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 50px;
+            border: 2px solid var(--e-global-color-primary);
+            box-shadow: 0 5px 15px rgba(255, 209, 0, 0.3);
+        }
+
+        .queue-info {
+            font-size: 1.3em;
+            color: var(--e-global-color-primary);
+            font-weight: 500;
+        }
+
+        .queue-number {
+            color: var(--e-global-color-94587a8);
+            font-weight: 700;
+            font-size: 1.6em;
+            font-family: var(--e-global-typography-secondary-font-family);
+        }
+
+        /* Service Tiles Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .service-tile {
+            background: var(--e-global-color-94587a8);
+            border: 2px solid var(--e-global-color-primary);
+            border-radius: 16px;
+            padding: 35px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--e-global-color-primary), var(--e-global-color-accent));
+        }
+
+        .service-tile:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(255, 209, 0, 0.2);
+            border-color: var(--e-global-color-secondary);
+        }
+
+        .tile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 1.4em;
+            color: var(--e-global-color-secondary);
+            font-weight: 700;
+            font-family: var(--e-global-typography-secondary-font-family);
+        }
+
+        .tile-header span {
+            font-size: 1.8em;
+            margin-right: 15px;
+            background: linear-gradient(135deg, var(--e-global-color-primary), var(--e-global-color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .service-list {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .service-item {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--e-global-color-cc3131e);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--e-global-color-text);
+            font-weight: 500;
+            position: relative;
+        }
+
+        .service-item:last-child {
+            border-bottom: none;
+        }
+
+        .service-item:hover {
+            color: var(--e-global-color-secondary);
+            padding-left: 10px;
+        }
+
+        .service-item:hover::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: var(--e-global-color-primary);
+            font-weight: bold;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--e-global-color-primary), #ffde33);
+            color: var(--e-global-color-secondary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: var(--e-global-typography-accent-font-family);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 209, 0, 0.4);
+            background: var(--e-global-color-secondary);
+            color: var(--e-global-color-primary);
+        }
+
+        /* Service Mode Styles */
+        .service-mode {
+            display: none;
+            background: var(--e-global-color-accent);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .service-header {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            border-bottom: 2px solid var(--e-global-color-primary);
+            padding-bottom: 25px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--e-global-color-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            font-family: var(--e-global-typography-accent-font-family);
+        }
+
+        .back-button:hover {
+            color: var(--e-global-color-primary);
+        }
+
+        .service-flow {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .step h3 {
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--e-global-color-secondary);
+            font-family: var(--e-global-typography-secondary-font-family);
+            text-align: center;
+        }
+
+        .service-options {
+            display: grid;
+            gap: 20px;
+        }
+
+        .service-option {
+            background: var(--e-global-color-94587a8);
+            border: 2px solid var(--e-global-color-primary);
+            border-radius: 12px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .service-option:hover {
+            border-color: var(--e-global-color-secondary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 209, 0, 0.2);
+        }
+
+        .service-option h4 {
+            margin: 15px 0 10px;
+            color: var(--e-global-color-secondary);
+            font-size: 1.2em;
+            font-weight: 700;
+            font-family: var(--e-global-typography-secondary-font-family);
+        }
+
+        .service-option p {
+            color: var(--e-global-color-text);
+            font-size: 15px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .service-option small {
+            color: var(--e-global-color-4f947fa);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--e-global-color-secondary);
+            font-family: var(--e-global-typography-accent-font-family);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--e-global-color-primary);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            font-family: var(--e-global-typography-text-font-family);
+            background: var(--e-global-color-94587a8);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--e-global-color-secondary);
+            box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--e-global-color-primary), #ffde33);
+            color: var(--e-global-color-secondary);
+            border: none;
+            padding: 16px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-family: var(--e-global-typography-accent-font-family);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 209, 0, 0.4);
+            background: var(--e-global-color-secondary);
+            color: var(--e-global-color-primary);
+        }
+
+        .contact-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .contact-options button {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid var(--e-global-color-primary);
+            background: var(--e-global-color-94587a8);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--e-global-color-secondary);
+            font-family: var(--e-global-typography-accent-font-family);
+        }
+
+        .contact-options button.active {
+            background: var(--e-global-color-primary);
+            color: var(--e-global-color-secondary);
+            border-color: var(--e-global-color-primary);
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 60px 30px;
+            background: var(--e-global-color-94587a8);
+            border-radius: 16px;
+            margin-top: 40px;
+            border: 2px solid var(--e-global-color-primary);
+        }
+
+        .success-message h3 {
+            color: var(--e-global-color-secondary);
+            margin-bottom: 20px;
+            font-size: 2em;
+            font-family: var(--e-global-typography-secondary-font-family);
+        }
+
+        .success-message p {
+            color: var(--e-global-color-text);
+            margin: 12px 0;
+            font-size: 16px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--e-global-color-primary);
+            color: var(--e-global-color-secondary);
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .feedback-section {
+            margin-bottom: 30px;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 25px 0;
+        }
+
+        .star {
+            font-size: 2em;
+            color: var(--e-global-color-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px;
+        }
+
+        .star:hover, .star.active {
+            color: var(--e-global-color-94587a8);
+            transform: scale(1.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                height: auto;
+                padding: 20px 0;
+            }
+
+            .main-nav {
+                margin: 20px 0;
+                gap: 25px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-tile {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-nav {
+                gap: 15px;
+            }
+
+            .nav-link {
+                font-size: 14px;
+            }
+
+            .hero {
+                padding: 60px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2em;
+            }
+            
+            .hero p {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <a href="#" class="logo">YAS</a>
+            <div class="main-nav">
+                <a href="#" class="nav-link">Mobile Plans</a>
+                <a href="#" class="nav-link">Home Plans</a>
+                <a href="#" class="nav-link">Lifestyle</a>
+                <a href="#" class="nav-link">Devices</a>
+            </div>
+            <div class="nav-actions">
+                <button class="login-btn">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>We're here for you</h1>
+            <p>Get instant help with your YAS services and products</p>
+        </div>
+    </section>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <!-- Queue Information - Hidden by default -->
+        <div class="queue-section" id="queueSection">
+            <div class="queue-info">
+                You are number <span class="queue-number" id="queuePosition">3</span> in line.<br>
+                Estimated wait time: <span class="queue-number" id="waitTime">&lt;10 minutes</span>
+            </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="services-grid">
+            <!-- Quick Services -->
+            <div class="service-tile">
+                <div class="tile-header">
+                    <span>⚡</span> Quick Services
+                </div>
+                <ul class="service-list">
+                    <li class="service-item" data-service="puk">PUK Code Retrieval</li>
+                    <li class="service-item" data-service="estatement">E-Statement</li>
+                    <li class="service-item" data-service="transaction-reversal">Transaction Reversal</li>
+                    <li class="service-item" data-service="locked-device">Locked Device Finance</li>
+                    <li class="service-item" data-service="clearance-letter">Nivushe Clearance Letter</li>
+                </ul>
+                <button class="action-button start-service">Get Quick Help</button>
+            </div>
+
+            <!-- Products & Packages -->
+            <div class="service-tile">
+                <div class="tile-header">
+                    <span>📦</span> Products & Packages
+                </div>
+                <ul class="service-list">
+                    <li class="service-item" data-service="data-bundle">Data Bundle</li>
+                    <li class="service-item" data-service="b2b">B2B Packages</li>
+                    <li class="service-item" data-service="kinara">Kinara Packages</li>
+                    <li class="service-item" data-service="esim">eSIM Activation</li>
+                    <li class="service-item" data-service="device-finance">Device Finance</li>
+                    <li class="service-item" data-service="hbb">HBB Devices</li>
+                </ul>
+                <button class="action-button start-service">Browse Products</button>
+            </div>
+
+            <!-- Support & Contact -->
+            <div class="service-tile">
+                <div class="tile-header">
+                    <span>🛟</span> Support & Contact
+                </div>
+                <ul class="service-list">
+                    <li class="service-item" data-service="br-chatbot">BR Chatbot Assistance</li>
+                    <li class="service-item" data-service="call">Call Support</li>
+                    <li class="service-item" data-service="location">Visit Our Shop</li>
+                    <li class="service-item" data-service="appointment">Book Appointment</li>
+                </ul>
+                <button class="action-button start-service">Get Support</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="feedback-section">
+            <div>How was your service experience?</div>
+            <div class="stars">
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+            </div>
+        </div>
+        <div>© 2024 YAS. All rights reserved.</div>
+    </footer>
+
+    <!-- Service Mode Interface -->
+    <div class="service-mode">
+        <div class="service-header">
+            <button class="back-button">← Back to Main Menu</button>
+            <h2>How can we help you today?</h2>
+        </div>
+        
+        <div class="service-flow">
+            <!-- STEP 1: Service Selection -->
+            <div class="step active" id="step1">
+                <h3>Select Service Type</h3>
+                <div class="service-options">
+                    <div class="service-option" data-type="quick-service">
+                        <span>⚡</span>
+                        <h4>Quick Service</h4>
+                        <p>PUK, E-Statement, Transaction Reversal, Clearance Letters</p>
+                        <small>Instant solutions in under 5 minutes</small>
+                    </div>
+                    
+                    <div class="service-option" data-type="product-service">
+                        <span>📦</span>
+                        <h4>Products & Packages</h4>
+                        <p>Data Bundles, B2B, Kinara, Device Finance, eSIM</p>
+                        <small>Purchase and activation services</small>
+                    </div>
+                    
+                    <div class="service-option" data-type="support-service">
+                        <span>🛟</span>
+                        <h4>Support & Assistance</h4>
+                        <p>BR Chatbot, Technical Support, Account Issues</p>
+                        <small>Expert assistance and guidance</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: Customer Identification -->
+            <div class="step" id="step2">
+                <h3>Identify Your Account</h3>
+                <div class="form-group">
+                    <input type="tel" id="phoneInput" placeholder="Enter your phone number" class="form-control" required>
+                </div>
+                <p style="text-align: center; margin: 20px 0; color: var(--e-global-color-text); font-weight: 500;">OR</p>
+                <button class="btn-primary" style="background: transparent; border: 2px solid var(--e-global-color-primary); color: var(--e-global-color-secondary); margin-bottom: 20px;">📱 Scan SIM Card/QR Code</button>
+                <button class="btn-primary" id="toStep3">Continue</button>
+            </div>
+
+            <!-- STEP 3: Specific Service Selection -->
+            <div class="step" id="step3">
+                <h3>What do you need help with?</h3>
+                <div class="specific-services" id="specificServices">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+                <button class="btn-primary" id="toStep4" style="display: none; margin-top: 20px;">Next</button>
+            </div>
+
+            <!-- STEP 4: Lead Qualification -->
+            <div class="step" id="step4">
+                <h3>Almost Done!</h3>
+                <div class="form-group">
+                    <label>When are you looking to solve this?</label>
+                    <select class="form-control" id="timelineSelect">
+                        <option value="immediate">Today/Right Now</option>
+                        <option value="this-week">Within this week</option>
+                        <option value="this-month">Within this month</option>
+                        <option value="just-browsing">Just gathering information</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Would you like us to contact you about special offers?</label>
+                    <div class="contact-options">
+                        <button type="button" value="yes">Yes, please</button>
+                        <button type="button" value="no" class="active">No, thank you</button>
+                    </div>
+                </div>
+                <button class="btn-primary" id="submitRequest">Finish & See Agent</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Service Flow State
+        let serviceData = {
+            serviceType: '',
+            specificService: '',
+            phoneNumber: '',
+            timeline: 'immediate',
+            contactPreference: 'no',
+            hasAppointment: false
+        };
+
+        // Queue state
+        let queueState = {
+            position: 3,
+            waitTime: 10,
+            totalInQueue: 5,
+            isActive: false
+        };
+
+        // Service Options Data
+        const serviceOptions = {
+            'quick-service': [
+                { id: 'puk', name: 'PUK Code Retrieval', icon: '🔑', description: 'Retrieve your SIM PUK code instantly' },
+                { id: 'estatement', name: 'E-Statement', icon: '📄', description: 'Get your digital account statement' },
+                { id: 'transaction-reversal', name: 'Transaction Reversal', icon: '↩️', description: 'Reverse incorrect transactions' },
+                { id: 'locked-device', name: 'Locked Device Finance', icon: '📱', description: 'Unlock device finance issues' },
+                { id: 'clearance-letter', name: 'Nivushe Clearance Letter', icon: '📝', description: 'Generate clearance letters' }
+            ],
+            'product-service': [
+                { id: 'data-bundle', name: 'Data Bundle', icon: '📊', description: 'Purchase data bundles and packages' },
+                { id: 'b2b', name: 'B2B Packages', icon: '🏢', description: 'Business packages and solutions' },
+                { id: 'kinara', name: 'Kinara Packages', icon: '🎁', description: 'Special Kinara offers and deals' },
+                { id: 'esim', name: 'eSIM Activation', icon: '📲', description: 'Activate eSIM service' },
+                { id: 'device-finance', name: 'Device Finance', icon: '💳', description: 'Device financing options' },
+                { id: 'hbb', name: 'HBB Devices', icon: '🖥️', description: 'Home broadband devices' }
+            ],
+            'support-service': [
+                { id: 'br-chatbot', name: 'BR Chatbot', icon: '🤖', description: 'AI-powered assistance' },
+                { id: 'call', name: 'Call Support', icon: '📞', description: 'Speak with our agents' },
+                { id: 'location', name: 'Visit Shop', icon: '🏪', description: 'Find our location' },
+                { id: 'appointment', name: 'Book Appointment', icon: '📅', description: 'Schedule a meeting' }
+            ]
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+        });
+
+        function initializeEventListeners() {
+            // Start service buttons
+            document.querySelectorAll('.start-service').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    startServiceFlow();
+                });
+            });
+
+            // Service items in main dashboard
+            document.querySelectorAll('.service-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Determine service type based on parent tile
+                    const tile = this.closest('.service-tile');
+                    let serviceType = 'quick-service';
+                    
+                    if (tile) {
+                        const icon = tile.querySelector('.tile-header span')?.textContent;
+                        if (icon === '📦') serviceType = 'product-service';
+                        else if (icon === '🛟') serviceType = 'support-service';
+                    }
+                    
+                    // Start service flow with pre-selected service
+                    startServiceFlow(serviceType, this.dataset.service);
+                });
+            });
+
+            // Back button
+            document.querySelector('.back-button').addEventListener('click', function() {
+                document.querySelector('.dashboard-container').style.display = 'block';
+                document.querySelector('.service-mode').style.display = 'none';
+                document.querySelector('.hero').style.display = 'block';
+                document.querySelector('.top-nav').style.display = 'block';
+                document.querySelector('.footer').style.display = 'block';
+                resetServiceFlow();
+            });
+
+            // Service type selection
+            document.querySelectorAll('.service-option[data-type]').forEach(option => {
+                option.addEventListener('click', function() {
+                    serviceData.serviceType = this.dataset.type;
+                    showStep(2);
+                });
+            });
+
+            // Phone number validation and next step
+            document.getElementById('toStep3').addEventListener('click', function() {
+                const phoneInput = document.getElementById('phoneInput');
+                if (phoneInput.value.trim() && phoneInput.checkValidity()) {
+                    serviceData.phoneNumber = phoneInput.value;
+                    showSpecificServices();
+                    showStep(3);
+                } else {
+                    alert('Please enter a valid phone number');
+                    phoneInput.focus();
+                }
+            });
+
+            // Timeline selection
+            document.getElementById('timelineSelect').addEventListener('change', function() {
+                serviceData.timeline = this.value;
+            });
+
+            // Contact preference
+            document.querySelectorAll('.contact-options button').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.contact-options button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    serviceData.contactPreference = this.value;
+                });
+            });
+
+            // Submit request
+            document.getElementById('submitRequest').addEventListener('click', function() {
+                if (validateServiceData()) {
+                    const leadScore = calculateLeadScore(serviceData);
+                    submitLead(leadScore);
+                }
+            });
+
+            // Star rating
+            document.querySelectorAll('.star').forEach(star => {
+                star.addEventListener('click', function() {
+                    const stars = this.parentElement.querySelectorAll('.star');
+                    const clickedIndex = Array.from(stars).indexOf(this);
+                    
+                    stars.forEach((s, index) => {
+                        s.classList.toggle('active', index <= clickedIndex);
+                    });
+                    
+                    console.log('User rating:', clickedIndex + 1);
+                    alert('Thank you for your feedback!');
+                });
+            });
+        }
+
+        function startServiceFlow(serviceType = '', specificService = '') {
+            // Hide main interface and show service mode
+            document.querySelector('.dashboard-container').style.display = 'none';
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.top-nav').style.display = 'none';
+            document.querySelector('.footer').style.display = 'none';
+            document.querySelector('.service-mode').style.display = 'block';
+            
+            // Set service data if provided
+            if (serviceType && specificService) {
+                serviceData.serviceType = serviceType;
+                serviceData.specificService = specificService;
+                showStep(2);
+            } else {
+                showStep(1);
+            }
+        }
+
+        function showStep(stepNumber) {
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show the selected step
+            const stepElement = document.getElementById(`step${stepNumber}`);
+            if (stepElement) {
+                stepElement.classList.add('active');
+                
+                if (stepNumber === 2 && serviceData.specificService) {
+                    setTimeout(() => {
+                        if (validatePhoneNumber()) {
+                            showSpecificServices();
+                            showStep(3);
+                        }
+                    }, 500);
+                }
+                
+                if (stepNumber === 3) {
+                    showSpecificServices();
+                }
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showSpecificServices() {
+            const servicesContainer = document.getElementById('specificServices');
+            const nextButton = document.getElementById('toStep4');
+            
+            if (!servicesContainer) return;
+            
+            servicesContainer.innerHTML = '';
+            
+            const services = serviceOptions[serviceData.serviceType] || [];
+            
+            if (services.length === 0) {
+                servicesContainer.innerHTML = '<p>No services available for this category.</p>';
+                nextButton.style.display = 'none';
+                return;
+            }
+            
+            services.forEach(service => {
+                const serviceElement = document.createElement('div');
+                serviceElement.className = 'service-option';
+                serviceElement.innerHTML = `
+                    <span>${service.icon}</span>
+                    <h4>${service.name}</h4>
+                    <p>${service.description}</p>
+                `;
+                
+                serviceElement.addEventListener('click', function() {
+                    servicesContainer.querySelectorAll('.service-option').forEach(opt => {
+                        opt.style.borderColor = 'var(--e-global-color-primary)';
+                        opt.style.background = 'var(--e-global-color-94587a8)';
+                    });
+                    
+                    this.style.borderColor = 'var(--e-global-color-secondary)';
+                    this.style.background = 'var(--e-global-color-accent)';
+                    
+                    serviceData.specificService = service.id;
+                    
+                    // If this is an appointment booking, activate queue system
+                    if (service.id === 'appointment') {
+                        serviceData.hasAppointment = true;
+                    }
+                    
+                    nextButton.style.display = 'block';
+                });
+                
+                if (service.id === serviceData.specificService) {
+                    serviceElement.style.borderColor = 'var(--e-global-color-secondary)';
+                    serviceElement.style.background = 'var(--e-global-color-accent)';
+                    nextButton.style.display = 'block';
+                }
+                
+                servicesContainer.appendChild(serviceElement);
+            });
+            
+            nextButton.onclick = function() {
+                if (serviceData.specificService) {
+                    showStep(4);
+                } else {
+                    alert('Please select a service');
+                }
+            };
+        }
+
+        function validatePhoneNumber() {
+            const phoneInput = document.getElementById('phoneInput');
+            if (phoneInput.value.trim() && phoneInput.checkValidity()) {
+                serviceData.phoneNumber = phoneInput.value;
+                return true;
+            }
+            return false;
+        }
+
+        function validateServiceData() {
+            if (!serviceData.phoneNumber) {
+                alert('Please enter your phone number');
+                showStep(2);
+                return false;
+            }
+            
+            if (!serviceData.specificService) {
+                alert('Please select a service');
+                showStep(3);
+                return false;
+            }
+            
+            return true;
+        }
+
+        function calculateLeadScore(data) {
+            let score = 0;
+            
+            switch(data.serviceType) {
+                case 'quick-service':
+                    score = 10;
+                    break;
+                case 'product-service':
+                    score = 85;
+                    break;
+                case 'support-service':
+                    score = 50;
+                    break;
+            }
+            
+            if (data.timeline === 'immediate') score += 20;
+            if (data.timeline === 'just-browsing') score -= 30;
+            
+            return Math.max(0, Math.min(100, score));
+        }
+
+        function submitLead(score) {
+            console.log('Submitting lead:', { ...serviceData, score });
+            
+            // If this is an appointment, activate the queue system
+            if (serviceData.specificService === 'appointment') {
+                activateQueueSystem();
+            }
+            
+            const serviceMode = document.querySelector('.service-mode');
+            const selectedService = Object.values(serviceOptions)
+                .flat()
+                .find(s => s.id === serviceData.specificService);
+            
+            const serviceName = selectedService ? selectedService.name : 'your request';
+            
+            serviceMode.innerHTML = `
+                <div class="success-message">
+                    <h3>✅ Thank You!</h3>
+                    <p>Your <strong>${serviceName}</strong> request has been received.</p>
+                    <p><strong>Phone:</strong> ${serviceData.phoneNumber}</p>
+                    <p><strong>Priority Score:</strong> ${score}/100</p>
+                    ${serviceData.specificService === 'appointment' ? 
+                        '<p><strong>Your appointment has been scheduled!</strong></p>' : 
+                        '<p>We\'ll contact you shortly to assist with your request.</p>'
+                    }
+                    <button class="btn-primary" onclick="location.reload()">Back to Home</button>
+                </div>
+            `;
+        }
+
+        function activateQueueSystem() {
+            // Show queue section
+            const queueSection = document.getElementById('queueSection');
+            queueSection.style.display = 'block';
+            
+            // Initialize queue state
+            queueState = {
+                position: Math.floor(Math.random() * 5) + 1, // Random position 1-5
+                waitTime: Math.floor(Math.random() * 15) + 5, // Random wait 5-20 minutes
+                totalInQueue: Math.floor(Math.random() * 10) + 3, // Random total 3-12
+                isActive: true
+            };
+            
+            // Update queue display
+            updateQueueDisplay();
+            
+            // Start queue countdown
+            startQueueCountdown();
+        }
+
+        function updateQueueDisplay() {
+            document.getElementById('queuePosition').textContent = queueState.position;
+            document.getElementById('waitTime').textContent = `<${queueState.waitTime} minutes`;
+        }
+
+        function startQueueCountdown() {
+            if (!queueState.isActive) return;
+            
+            const countdownInterval = setInterval(() => {
+                // Decrease wait time
+                if (queueState.waitTime > 0) {
+                    queueState.waitTime--;
+                }
+                
+                // Randomly move up in queue (simulating other customers being served)
+                if (Math.random() < 0.3 && queueState.position > 1) { // 30% chance to move up
+                    queueState.position--;
+                }
+                
+                // Update display
+                updateQueueDisplay();
+                
+                // Stop countdown when served
+                if (queueState.position === 1 && queueState.waitTime <= 0) {
+                    clearInterval(countdownInterval);
+                    queueState.isActive = false;
+                    document.querySelector('.queue-info').innerHTML = 
+                        '<h3>🎉 It\'s your turn!</h3><p>Please proceed to the counter.</p>';
+                }
+            }, 60000); // Update every minute
+        }
+
+        function resetServiceFlow() {
+            serviceData = {
+                serviceType: '',
+                specificService: '',
+                phoneNumber: '',
+                timeline: 'immediate',
+                contactPreference: 'no',
+                hasAppointment: false
+            };
+            
+            document.getElementById('phoneInput').value = '';
+            document.getElementById('timelineSelect').value = 'immediate';
+            document.querySelectorAll('.contact-options button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.contact-options button[value="no"]').classList.add('active');
+            
+            showStep(1);
+        }
+    </script>
+</body>
+</html>

@@ -6,6 +6,7 @@ from django.db.models import Count, Q, Avg
 from django.utils import timezone
 from datetime import timedelta
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Agent, Customer, Lead, Feedback, Interaction
 from .forms import LeadUpdateForm, FeedbackForm, InteractionForm
 
@@ -264,3 +265,53 @@ def handler404(request, exception):
 def handler500(request):
     """Custom 500 error handler."""
     return render(request, 'sales_hub/500.html', status=500)
+
+
+@login_required
+def customer_list(request):
+    """List all customers with search and filtering options."""
+    try:
+        agent = request.user.agent_profile
+    except Agent.DoesNotExist:
+        messages.error(request, "You need to have an agent profile to view customers.")
+        return redirect('sales_hub:dashboard')
+    
+    # Get search query
+    search_query = request.GET.get('q', '')
+    
+    # Start with base queryset
+    customers = Customer.objects.filter(is_active=True)
+    
+    # Apply search if query exists
+    if search_query:
+        customers = customers.filter(
+            Q(name__icontains=search_query) |
+            Q(phone__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+    
+    # Filter by assigned agent if not superuser
+    if not request.user.is_superuser:
+        customers = customers.filter(assigned_agent=agent)
+    
+    # Order by most recent first
+    customers = customers.order_by('-created_at')
+    
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(customers, 20)  # Show 20 customers per page
+    
+    try:
+        customers_page = paginator.page(page)
+    except PageNotAnInteger:
+        customers_page = paginator.page(1)
+    except EmptyPage:
+        customers_page = paginator.page(paginator.num_pages)
+    
+    context = {
+        'customers': customers_page,
+        'search_query': search_query,
+        'active_tab': 'customers',
+    }
+    
+    return render(request, 'sales_hub/customer_list.html', context)

@@ -9,6 +9,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 # Import the dashboard view from sales_hub
 from sales_hub.views import dashboard
@@ -22,16 +23,19 @@ urlpatterns = [
     
     # Authentication URLs
     path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='public_site:home'), name='logout'),
     
-    # Sales Hub App
-    path('', include('sales_hub.urls')),
+    # Public Site (Customer-facing)
+    path('', include('public_site.urls')),  # app_name is defined in public_site/urls.py
+    
+    # Sales Hub App (Agent Dashboard)
+    path('dashboard/', include(('sales_hub.urls', 'sales_hub'))),
     
     # WhatsApp Webhook
-    path('whatsapp/', include('whatsapp_webhook.urls')),
+    path('whatsapp/', include(('whatsapp_webhook.urls', 'whatsapp_webhook'))),
     
-    # Set dashboard as the root URL
-    path('', dashboard, name='home'),
+    # Redirect old root URL to the new dashboard URL
+    path('sales/', RedirectView.as_view(url='/dashboard/')),
 ]
 
 # Serve media files in development
