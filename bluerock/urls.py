@@ -10,12 +10,13 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+from django.views.decorators.csrf import csrf_exempt
 
 # Import the dashboard view from sales_hub
 from sales_hub.views import dashboard
 
 # Import WhatsApp webhook view
-from whatsapp_webhook import views as whatsapp_views
+from whatsapp_webhook.views import whatsapp_webhook
 
 urlpatterns = [
     # Admin site
@@ -31,7 +32,8 @@ urlpatterns = [
     # Sales Hub App (Agent Dashboard)
     path('dashboard/', include(('sales_hub.urls', 'sales_hub'))),
     
-    # WhatsApp Webhook
+    # WhatsApp Webhook - Support both /webhook/ and /whatsapp/webhook/ for backward compatibility
+    path('webhook/', whatsapp_webhook, name='webhook'),
     path('whatsapp/', include(('whatsapp_webhook.urls', 'whatsapp_webhook'))),
     
     # Redirect old root URL to the new dashboard URL
