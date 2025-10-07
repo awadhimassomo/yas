@@ -15,8 +15,8 @@ from django.views.decorators.csrf import csrf_exempt
 # Import the dashboard view from sales_hub
 from sales_hub.views import dashboard
 
-# Import WhatsApp webhook view
-from whatsapp_webhook.views import whatsapp_webhook
+# Import WhatsApp webhook views
+from whatsapp_webhook.views import whatsapp_webhook, view_webhook_messages
 
 urlpatterns = [
     # Admin site
@@ -37,7 +37,7 @@ urlpatterns = [
     path('whatsapp/', include(('whatsapp_webhook.urls', 'whatsapp_webhook'))),
     
     # Webhook messages viewer (for debugging)
-    path('webhook-messages/', whatsapp_views.view_webhook_messages, name='webhook_messages'),
+    path('webhook-messages/', view_webhook_messages, name='webhook_messages'),
     
     # Redirect old root URL to the new dashboard URL
     path('sales/', RedirectView.as_view(url='/dashboard/')),
