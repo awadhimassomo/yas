@@ -1,48 +1,114 @@
-from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 import json
 import hmac
 import hashlib
 import logging
+import time
 from datetime import datetime
+from functools import wraps
+
+# Global message storage
+webhook_messages = []
 
 # Set up logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 # Get WhatsApp credentials from settings
 WHATSAPP_VERIFY_TOKEN = getattr(settings, 'WHATSAPP_VERIFY_TOKEN', 'yasbluerock_webhook_2024')
 WHATSAPP_APP_SECRET = getattr(settings, 'WHATSAPP_APP_SECRET', '')
 
+# Store messages in memory (for demo purposes - in production, use a database)
+MAX_STORED_MESSAGES = 50
+
+def store_message(data):
+    """Store incoming message in memory"""
+    global webhook_messages
+    webhook_messages.append({
+        'timestamp': time.time(),
+        'data': data
+    })
+    # Keep only the most recent messages
+    webhook_messages = webhook_messages[-MAX_STORED_MESSAGES:]
+
+def log_webhook_event(level=logging.INFO):
+    """Decorator to log webhook events"""
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            logger.log(level, f"🔔 {request.method} request to {request.path}")
+            if request.method == 'POST':
+                try:
+                    body = request.body.decode('utf-8')
+                    logger.log(level, f"📦 Raw payload: {body}")
+                    data = json.loads(body)
+                    logger.log(level, f"📨 Parsed data: {json.dumps(data, indent=2, ensure_ascii=False)}")
+                    store_message(data)  # Store the message
+                except Exception as e:
+                    logger.error(f"❌ Error processing request body: {e}")
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator
+
 @csrf_exempt
 @require_http_methods(['GET', 'POST'])
+@log_webhook_event()
 def whatsapp_webhook(request):
     """
     Handles incoming WhatsApp webhook events
     """
-    logger.info(f"[{datetime.now()}] Received {request.method} request to webhook endpoint")
-    
-    # Handle GET request for webhook verification
     if request.method == 'GET':
         return handle_webhook_verification(request)
     
-    # Handle POST request (incoming messages)
-    logger.info("🎯 RECEIVED WHATSAPP MESSAGE!")
-    logger.info(f"📦 Raw body: {request.body.decode('utf-8', errors='replace')}")
-    
     try:
         data = json.loads(request.body.decode('utf-8'))
-        logger.info(f"📨 Parsed data: {json.dumps(data, indent=2, ensure_ascii=False)}")
         
-        # Process the webhook event
-        response = handle_webhook_event(request)
-        logger.info(f"✅ Successfully processed message. Response: {response.status_code}")
-        return response
+        # Process different types of webhook events
+        for entry in data.get('entry', []):
+            for change in entry.get('changes', []):
+                field = change.get('field')
+                logger.info(f"🔔 Processing field: {field}")
+                
+                if field == 'messages':
+                    messages_data = change.get('value', {})
+                    logger.info(f"📩 Message data: {json.dumps(messages_data, indent=2)}")
+                    
+                    # Log message details
+                    for message in messages_data.get('messages', []):
+                        from_number = message.get('from')
+                        message_type = message.get('type')
+                        message_id = message.get('id')
+                        
+                        logger.info(f"💬 Message from {from_number}: Type={message_type}, ID={message_id}")
+                        
+                        if message_type == 'text':
+                            text = message.get('text', {}).get('body', '')
+                            logger.info(f"📝 Text content: {text}")
+        
+        return HttpResponse('OK', status=200)
         
     except Exception as e:
-        logger.error(f"❌ Error processing webhook: {str(e)}", exc_info=True)
+        logger.error(f"❌ Error processing webhook: {e}", exc_info=True)
         return HttpResponse('Server Error', status=500)
+
+def view_webhook_messages(request):
+    """View to display recent webhook messages (for debugging)"""
+    if not settings.DEBUG:
+        return JsonResponse({'error': 'Not available in production'}, status=403)
+        
+    return JsonResponse({
+        'status': 'success',
+        'count': len(webhook_messages),
+        'messages': webhook_messages
+    }, json_dumps_params={'indent': 2})
 
 def handle_webhook_verification(request):
     """Handle webhook verification request"""

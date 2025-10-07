@@ -36,6 +36,9 @@ urlpatterns = [
     path('webhook/', whatsapp_webhook, name='webhook'),
     path('whatsapp/', include(('whatsapp_webhook.urls', 'whatsapp_webhook'))),
     
+    # Webhook messages viewer (for debugging)
+    path('webhook-messages/', whatsapp_views.view_webhook_messages, name='webhook_messages'),
+    
     # Redirect old root URL to the new dashboard URL
     path('sales/', RedirectView.as_view(url='/dashboard/')),
 ]
