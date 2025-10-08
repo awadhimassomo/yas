@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}YAS Sales Hub{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom styles -->
+    <style>
+        /* YAS Brand Colors */
+        :root {
+            --yas-primary: #ffd100;     /* Main yellow */
+            --yas-secondary: #00377d;   /* Dark blue */
+            --yas-text: #4d73a4;        /* Text color */
+            --yas-accent: #fffdda;      /* Light yellow background */
+            --yas-light-blue: #5f99d2;   /* Light blue */
+            --yas-white: #fff;          /* White */
+            --yas-light-bg: #fffdf2;    /* Off-white background */
+            --yas-light-gray: #f2f5f9;  /* Light gray */
+        }
+
+        body {
+            background-color: var(--yas-accent);
+            font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+            color: var(--yas-text);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -8,6 +8,7 @@ from datetime import timedelta
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Agent, Customer, Lead, Feedback, Interaction
+from .quick_services import QuickServiceRequest
 from .forms import LeadUpdateForm, FeedbackForm, InteractionForm
 
 
@@ -55,6 +56,22 @@ def dashboard(request):
         (lead_stats['closed_won'] / total_closed * 100) if total_closed > 0 else 0
     )
     
+    # Get Quick Services statistics
+    quick_services = QuickServiceRequest.objects.filter(customer__assigned_agent=agent)
+    
+    # Get recent Quick Services requests (last 5)
+    recent_quick_services = quick_services.order_by('-created_at')[:5]
+    
+    # Count by status
+    quick_services_stats = {
+        'total_requests': quick_services.count(),
+        'pending': quick_services.filter(status='pending').count(),
+        'in_progress': quick_services.filter(status='in_progress').count(),
+        'completed': quick_services.filter(status='completed').count(),
+        'cancelled': quick_services.filter(status='cancelled').count(),
+        'recent_requests': recent_quick_services,
+    }
+    
     context = {
         'agent': agent,
         'customers': customers,
@@ -62,7 +79,13 @@ def dashboard(request):
         'recent_feedback': recent_feedback,
         'recent_interactions': recent_interactions,
         'lead_stats': lead_stats,
+        'quick_services_stats': quick_services_stats,
         'active_tab': 'dashboard',
+        'interactions_with_followup': Interaction.objects.filter(
+            agent=agent,
+            follow_up_date__isnull=False,
+            follow_up_date__gte=timezone.now()
+        ).order_by('follow_up_date')[:5],
     }
     
     return render(request, 'sales_hub/dashboard.html', context)
@@ -245,11 +268,27 @@ def customer_detail(request, customer_id):
         avg_rating=Avg('rating')
     )['avg_rating'] or 0
     
+    # Get Quick Services history
+    quick_services = QuickServiceRequest.objects.filter(
+        customer=customer
+    ).order_by('-created_at')
+    
+    # Count by status
+    quick_services_stats = {
+        'total': quick_services.count(),
+        'pending': quick_services.filter(status='pending').count(),
+        'in_progress': quick_services.filter(status='in_progress').count(),
+        'completed': quick_services.filter(status='completed').count(),
+        'cancelled': quick_services.filter(status='cancelled').count(),
+    }
+    
     context = {
         'customer': customer,
         'lead': lead,
         'feedback_list': feedback_list,
         'interactions': interactions,
+        'quick_services': quick_services[:5],  # Show only the 5 most recent
+        'quick_services_stats': quick_services_stats,
         'avg_rating': round(avg_rating, 1),
         'active_tab': 'customers',
     }

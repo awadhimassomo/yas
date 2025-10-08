@@ -1,10 +1,34 @@
 {% extends 'sales_hub/base.html' %}
+{% load static %}
 
 {% block title %}Dashboard - Arusha Bluerock Sales Hub{% endblock %}
 
-{% block header %}Dashboard{% endblock %}
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'sales_hub/css/dashboard.css' %}">
+{% endblock %}
+
+{% block header %}
+<div class="flex justify-between items-center">
+    <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+    <button id="refresh-dashboard" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <svg class="-ml-0.5 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Refresh
+    </button>
+</div>
+{% endblock %}
 
 {% block content %}
+<div class="dashboard-page">
+    <!-- Loading indicator -->
+    <div id="loading-indicator" class="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Error container (will be shown when there are API errors) -->
+    <div id="error-container" class="fixed bottom-4 right-4 z-50"></div>
 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8 bg-yellow-50 p-6 rounded-lg shadow">
     <!-- Leads Card -->
     <div class="bg-yellow-50 overflow-hidden shadow rounded-lg border border-yellow-100 hover:shadow-md transition-shadow duration-200">
@@ -28,26 +52,26 @@
                 <div class="space-y-2">
                     <div class="flex justify-between text-sm text-gray-500">
                         <span>New</span>
-                        <span>{{ lead_stats.new }}</span>
+                        <span class="leads-new">0</span>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-yellow-500 h-2 rounded-full shadow-inner" style="width: {{ lead_stats.new|floatformat:0 }}%"></div>
+                    <div class="progress-bar leads-new-progress">
+                        <div class="progress-bar-fill" style="width: 0%"></div>
                     </div>
                     
                     <div class="flex justify-between text-sm text-gray-500">
                         <span>Contacted</span>
-                        <span>{{ lead_stats.contacted }}</span>
+                        <span class="leads-contacted">0</span>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-400 h-2 rounded-full" style="width: {{ lead_stats.contacted|floatformat:0 }}%"></div>
+                    <div class="progress-bar leads-contacted-progress">
+                        <div class="progress-bar-fill" style="width: 0%"></div>
                     </div>
                     
                     <div class="flex justify-between text-sm text-gray-500">
                         <span>Qualified</span>
-                        <span>{{ lead_stats.qualified }}</span>
+                        <span class="leads-qualified">0</span>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ lead_stats.qualified|floatformat:0 }}%"></div>
+                    <div class="progress-bar leads-qualified-progress">
+                        <div class="progress-bar-fill" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
@@ -67,7 +91,7 @@
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 truncate">Conversion Rate</dt>
                         <dd class="flex items-baseline">
-                            <div class="text-2xl font-semibold text-gray-900">{{ lead_stats.conversion_rate|floatformat:1 }}%</div>
+                            <div class="text-2xl font-semibold text-gray-900 conversion-rate">0%</div>
                         </dd>
                     </dl>
                 </div>
@@ -75,18 +99,18 @@
             <div class="mt-4">
                 <div class="flex justify-between text-sm text-gray-500">
                     <span>Won</span>
-                    <span>{{ lead_stats.closed_won }}</span>
+                    <span class="leads-won">0</span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ lead_stats.closed_won|floatformat:0 }}%"></div>
+                <div class="progress-bar leads-won-progress mt-1">
+                    <div class="progress-bar-fill" style="width: 0%"></div>
                 </div>
                 
                 <div class="flex justify-between text-sm text-gray-500 mt-3">
                     <span>Lost</span>
-                    <span>{{ lead_stats.closed_lost }}</span>
+                    <span class="leads-lost">0</span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                    <div class="bg-red-500 h-2 rounded-full" style="width: {{ lead_stats.closed_lost|floatformat:0 }}%"></div>
+                <div class="progress-bar leads-lost-progress mt-1">
+                    <div class="progress-bar-fill" style="width: 0%"></div>
                 </div>
             </div>
         </div>
@@ -196,105 +220,113 @@
             </div>
         </div>
     </div>
+
+    <!-- Quick Services Card -->
+    <div class="bg-yellow-50 overflow-hidden shadow rounded-lg border border-yellow-100 hover:shadow-md transition-shadow duration-200">
+        <div class="px-4 py-5 sm:p-6 bg-gradient-to-br from-yellow-50 to-yellow-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-500 rounded-md p-3 shadow">
+                        <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5">
+                        <h3 class="text-sm font-medium text-gray-500">Recent Quick Services</h3>
+                        <p class="text-2xl font-semibold text-gray-900">
+                            {{ quick_services_stats.total_requests }}
+                        </p>
+                    </div>
+                </div>
+                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">View all</a>
+            </div>
+            <div class="mt-4">
+                {% if quick_services_stats.recent_requests %}
+                    <ul class="divide-y divide-gray-200">
+                        {% for request in quick_services_stats.recent_requests %}
+                        <li class="py-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name={{ request.customer.name|urlencode }}&background=0ea5e9&color=fff" alt="{{ request.customer.name }}">
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900 truncate">{{ request.get_service_type_display }}</p>
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <span class="truncate">{{ request.customer.name }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if request.status == 'completed' %}bg-green-100 text-green-800{% elif request.status == 'in_progress' %}bg-blue-100 text-blue-800{% elif request.status == 'failed' %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                        {{ request.get_status_display }}
+                                    </span>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        {{ request.created_at|timesince }} ago
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-sm text-gray-500 text-center py-4">No recent Quick Services requests.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Recent Activity Section -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Recent Leads -->
+    <!-- Recent Activities -->
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
             <div class="flex justify-between items-center">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Leads</h3>
-                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">View all</a>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Activity</h3>
+                <button id="refresh-activities" class="text-sm font-medium text-blue-600 hover:text-blue-500 focus:outline-none" aria-label="Refresh activities">
+                    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
             </div>
         </div>
         <div class="bg-white overflow-hidden">
-            <ul class="divide-y divide-gray-200">
-                {% if leads %}
-                    {% for lead in leads|slice:":5" %}
-                    <li class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0">
-                                    <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ lead.customer.name|urlencode }}&background=0ea5e9&color=fff" alt="{{ lead.customer.name }}">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ lead.customer.name }}</div>
-                                    <div class="text-sm text-gray-500">{{ lead.get_status_display }}</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-sm text-gray-500">{{ lead.updated_at|timesince }} ago</div>
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    {% if lead.status == 'new' %}bg-blue-100 text-blue-800
-                                    {% elif lead.status == 'contacted' %}bg-yellow-100 text-yellow-800
-                                    {% elif lead.status == 'qualified' %}bg-green-100 text-green-800
-                                    {% elif lead.status == 'closed_won' %}bg-purple-100 text-purple-800
-                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
-                                    {{ lead.get_status_display }}
-                                </span>
-                            </div>
-                        </div>
-                    </li>
-                    {% endfor %}
-                {% else %}
-                    <li class="px-4 py-4 sm:px-6 text-center text-gray-500">
-                        No recent leads found.
-                    </li>
-                {% endif %}
-            </ul>
+            <div id="recent-activities" class="divide-y divide-gray-200">
+                <!-- Activities will be loaded here by JavaScript -->
+                <div class="px-4 py-8 text-center text-gray-500">
+                    <p>Loading activities...</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Recent Interactions -->
+    <!-- Quick Actions -->
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <div class="flex justify-between items-center">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Interactions</h3>
-                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">View all</a>
-            </div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Quick Actions</h3>
         </div>
-        <div class="bg-white overflow-hidden">
-            <ul class="divide-y divide-gray-200">
-                {% if recent_interactions %}
-                    {% for interaction in recent_interactions %}
-                    <li class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ interaction.agent.user.get_full_name|urlencode }}&background=0ea5e9&color=fff" alt="{{ interaction.agent.user.get_full_name }}">
-                            </div>
-                            <div class="ml-4 flex-1">
-                                <div class="flex items-center justify-between">
-                                    <p class="text-sm font-medium text-gray-900">
-                                        {{ interaction.agent.user.get_full_name }}
-                                        <span class="text-gray-500 font-normal">with</span>
-                                        {{ interaction.customer.name }}
-                                    </p>
-                                    <div class="text-sm text-gray-500">{{ interaction.created_at|timesince }} ago</div>
-                                </div>
-                                <div class="mt-1">
-                                    <p class="text-sm text-gray-600">{{ interaction.notes|truncatewords:20 }}</p>
-                                </div>
-                                <div class="mt-2">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {{ interaction.get_interaction_type_display }}
-                                    </span>
-                                    {% if interaction.follow_up_date %}
-                                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            Follow-up: {{ interaction.follow_up_date|date:"M d, Y" }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    {% endfor %}
-                {% else %}
-                    <li class="px-4 py-4 sm:px-6 text-center text-gray-500">
-                        No recent interactions found.
-                    </li>
-                {% endif %}
-            </ul>
+        <div class="p-6">
+            <div class="grid grid-cols-1 gap-4">
+                <button id="new-lead-btn" class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add New Lead
+                </button>
+                <button id="new-interaction-btn" class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    Log Interaction
+                </button>
+                <button id="new-support-request-btn" class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Create Support Request
+                </button>
+            </div>
         </div>
     </div>
 </div>

@@ -1,0 +1,112 @@
+/* Dashboard specific styles */
+.dashboard-page {
+    position: relative;
+}
+
+/* Loading indicator */
+#loading-indicator {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    display: none; /* Hidden by default */
+}
+
+.loading #loading-indicator {
+    display: flex;
+}
+
+/* Progress bars */
+.progress-bar {
+    height: 0.5rem;
+    background-color: #e5e7eb; /* bg-gray-200 */
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    transition: width 0.3s ease-in-out;
+}
+
+/* Lead status progress bars */
+.leads-new-progress .progress-bar-fill {
+    background-color: #f59e0b; /* bg-yellow-500 */
+}
+
+.leads-contacted-progress .progress-bar-fill {
+    background-color: #60a5fa; /* bg-blue-400 */
+}
+
+.leads-qualified-progress .progress-bar-fill {
+    background-color: #10b981; /* bg-green-500 */
+}
+
+.leads-won-progress .progress-bar-fill {
+    background-color: #10b981; /* bg-green-500 */
+}
+
+.leads-lost-progress .progress-bar-fill {
+    background-color: #ef4444; /* bg-red-500 */
+}
+
+/* Stats cards */
+.stats-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Activity feed */
+.activity-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Error messages */
+.error-message {
+    background-color: #fef2f2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.error-message svg {
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Animation for loading */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}

@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 from .models import Lead, Feedback, Interaction, Customer
+from .quick_services import QuickServiceRequest
 
 
 class LeadUpdateForm(ModelForm):
@@ -108,44 +109,56 @@ class InteractionForm(ModelForm):
     """Form for recording customer interactions."""
     class Meta:
         model = Interaction
-        fields = ['interaction_type', 'notes', 'follow_up_date', 'is_completed']
+        fields = ['action_type', 'details', 'notes', 'is_completed']
         widgets = {
-            'interaction_type': forms.Select(attrs={
-                'class': 'form-select',
+            'action_type': forms.Select(
+                attrs={
+                    'class': 'form-select',
+                },
+                choices=Interaction.ACTION_TYPES
+            ),
+            'details': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter any additional details in JSON format (optional)...',
             }),
             'notes': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
                 'placeholder': 'Enter details of the interaction...',
             }),
-            'follow_up_date': forms.DateTimeInput(attrs={
-                'class': 'form-control',
-                'type': 'datetime-local',
-                'min': timezone.now().strftime('%Y-%m-%dT%H:%M'),
-            }),
             'is_completed': forms.CheckboxInput(attrs={
                 'class': 'form-check-input',
             }),
         }
         help_texts = {
-            'interaction_type': 'Type of interaction (call, meeting, email, etc.)',
+            'action_type': 'Type of interaction (call, meeting, email, purchase, etc.)',
+            'details': 'Additional details in JSON format (e.g., {"duration": 30, "topic": "Product Demo"})',
             'notes': 'Details about what was discussed or accomplished.',
-            'follow_up_date': 'When should we follow up on this interaction?',
             'is_completed': 'Check if this interaction is complete.',
         }
 
-    def clean_follow_up_date(self):
-        follow_up_date = self.cleaned_data.get('follow_up_date')
-        if follow_up_date and follow_up_date < timezone.now():
-            raise ValidationError("Follow-up date cannot be in the past.")
-        return follow_up_date
+    def clean_details(self):
+        details = self.cleaned_data.get('details', '').strip()
+        if not details:
+            return {}
+        
+        try:
+            import json
+            # If details is already a dict (from model instance), return as is
+            if isinstance(details, dict):
+                return details
+            # Otherwise try to parse as JSON
+            return json.loads(details)
+        except json.JSONDecodeError:
+            raise ValidationError("Please enter valid JSON format for details.")
 
 
 class CustomerForm(ModelForm):
     """Form for adding/editing customer information."""
     class Meta:
         model = Customer
-        fields = ['name', 'phone', 'email', 'address', 'visit_reason', 'assigned_agent', 'notes']
+        fields = ['name', 'phone', 'email', 'address', 'visit_reason', 'notes', 'assigned_agent']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',

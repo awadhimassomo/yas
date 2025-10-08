@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from .models import Agent, Customer, Lead, Feedback, Interaction
+from .models import Agent, Customer, Lead, Feedback, Interaction, Product, Purchase, SupportRequest
 
 
 class AgentAdmin(admin.ModelAdmin):
@@ -123,29 +123,31 @@ class FeedbackAdmin(admin.ModelAdmin):
 
 
 class InteractionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'interaction_type_icon', 'customer_link', 'agent_link', 'short_notes', 'follow_up_date', 'is_completed', 'created_at')
-    list_filter = ('interaction_type', 'is_completed', 'created_at')
+    list_display = ('id', 'action_type_icon', 'customer_link', 'agent_link', 'short_notes', 'is_completed', 'created_at')
+    list_filter = ('action_type', 'is_completed', 'created_at')
     search_fields = ('customer__name', 'notes', 'agent__user__first_name', 'agent__user__last_name')
-    date_hierarchy = 'created_at'
-    readonly_fields = ('created_at', 'updated_at')
+    date_hierarchy = 'timestamp'
+    readonly_fields = ('created_at', 'updated_at', 'timestamp')
     list_select_related = ('customer', 'agent', 'agent__user')
     
-    def interaction_type_icon(self, obj):
+    def action_type_icon(self, obj):
         icons = {
             'call': '📞',
             'email': '📧',
-            'meeting': '👥',
+            'meeting': '🤝',
             'chat': '💬',
+            'purchase': '🛒',
+            'support': '🛠️',
+            'lead': '🎯',
             'other': '🔹',
         }
-        return f"{icons.get(obj.interaction_type, '')} {obj.get_interaction_type_display()}"
-    interaction_type_icon.short_description = 'Type'
+        return f"{icons.get(obj.action_type, '🔹')} {obj.get_action_type_display()}"
+    action_type_icon.short_description = 'Type'
     
     def customer_link(self, obj):
         url = reverse('admin:sales_hub_customer_change', args=[obj.customer.id])
         return mark_safe(f'<a href="{url}">{obj.customer.name}</a>')
     customer_link.short_description = 'Customer'
-    customer_link.allow_tags = True
     
     def agent_link(self, obj):
         if obj.agent:
@@ -156,8 +158,83 @@ class InteractionAdmin(admin.ModelAdmin):
     agent_link.allow_tags = True
     
     def short_notes(self, obj):
-        return obj.notes[:50] + '...' if len(obj.notes) > 50 else obj.notes
+        return f"{obj.notes[:50]}..." if obj.notes else ""
     short_notes.short_description = 'Notes'
+
+
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category_display', 'price', 'is_active', 'created_at')
+    list_filter = ('category', 'is_active')
+    search_fields = ('name', 'description')
+    list_editable = ('price', 'is_active')
+    
+    def category_display(self, obj):
+        return obj.get_category_display()
+    category_display.short_description = 'Category'
+
+
+class PurchaseAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer_link', 'product_link', 'quantity', 'total_amount', 'purchase_date')
+    list_filter = ('purchase_date', 'product__category')
+    search_fields = ('customer__name', 'product__name')
+    date_hierarchy = 'purchase_date'
+    list_select_related = ('customer', 'product', 'agent')
+    
+    def customer_link(self, obj):
+        url = reverse('admin:sales_hub_customer_change', args=[obj.customer.id])
+        return mark_safe(f'<a href="{url}">{obj.customer.name}</a>')
+    customer_link.short_description = 'Customer'
+    
+    def product_link(self, obj):
+        url = reverse('admin:sales_hub_product_change', args=[obj.product.id])
+        return mark_safe(f'<a href="{url}">{obj.product.name}</a>')
+    product_link.short_description = 'Product'
+
+
+class SupportRequestAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer_link', 'request_type_display', 'status_display', 'priority_display', 'assigned_to_link', 'created_at')
+    list_filter = ('status', 'priority', 'request_type', 'created_at')
+    search_fields = ('customer__name', 'subject', 'description')
+    date_hierarchy = 'created_at'
+    list_select_related = ('customer', 'assigned_to', 'assigned_to__user')
+    
+    def request_type_display(self, obj):
+        return obj.get_request_type_display()
+    request_type_display.short_description = 'Type'
+    
+    def status_display(self, obj):
+        status_icons = {
+            'open': '🔓',
+            'in_progress': '🔄',
+            'waiting': '⏳',
+            'resolved': '✅',
+            'closed': '🔒',
+        }
+        return f"{status_icons.get(obj.status, '')} {obj.get_status_display()}"
+    status_display.short_description = 'Status'
+    
+    def priority_display(self, obj):
+        priority_icons = {
+            1: '⬇️ Low',
+            2: '⏬ Medium',
+            3: '⬆️ High',
+            4: '🚨 Critical',
+        }
+        return priority_icons.get(obj.priority, obj.priority)
+    priority_display.short_description = 'Priority'
+    
+    def customer_link(self, obj):
+        url = reverse('admin:sales_hub_customer_change', args=[obj.customer.id])
+        return mark_safe(f'<a href="{url}">{obj.customer.name}</a>')
+    customer_link.short_description = 'Customer'
+    
+    def assigned_to_link(self, obj):
+        if obj.assigned_to:
+            url = reverse('admin:sales_hub_agent_change', args=[obj.assigned_to.id])
+            return mark_safe(f'<a href="{url}">{obj.assigned_to}</a>')
+        return "-"
+    assigned_to_link.short_description = 'Assigned To'
+    assigned_to_link.allow_tags = True
 
 
 # Register models with their admin classes
@@ -166,6 +243,9 @@ admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(Feedback, FeedbackAdmin)
 admin.site.register(Interaction, InteractionAdmin)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Purchase, PurchaseAdmin)
+admin.site.register(SupportRequest, SupportRequestAdmin)
 
 # Customize admin site header
 admin.site.site_header = "Arusha Bluerock Sales Hub Admin"

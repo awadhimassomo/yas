@@ -1,8 +1,14 @@
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import RedirectView
 from django.contrib.auth.decorators import login_required
 
 from . import views
+from .quick_services_views import (
+    QuickServiceRequestView, 
+    QuickServiceRequestUpdateView,
+    QuickServiceRequestDetailView,
+    CustomerQuickServiceHistoryView
+)
 
 app_name = 'sales_hub'
 
@@ -10,10 +16,27 @@ urlpatterns = [
     # Dashboard and main views
     path('', login_required(views.dashboard), name='dashboard'),
     
+    # Users app
+    path('users/', include('users.urls', namespace='users')),
+    
     # Customer-related URLs
     path('customers/', 
          login_required(views.customer_list), 
          name='customer_list'),
+    
+    # Quick Services URLs
+    path('customers/<int:customer_id>/quick-services/', 
+         login_required(CustomerQuickServiceHistoryView.as_view()), 
+         name='customer_quick_services'),
+    path('customers/<int:customer_id>/quick-services/request/', 
+         login_required(QuickServiceRequestView.as_view()), 
+         name='quick_service_request'),
+    path('quick-services/<int:pk>/', 
+         login_required(QuickServiceRequestDetailView.as_view()), 
+         name='quick_service_detail'),
+    path('quick-services/<int:pk>/update/', 
+         login_required(QuickServiceRequestUpdateView.as_view()), 
+         name='update_quick_service'),
     path('customers/<int:customer_id>/', 
          login_required(views.customer_detail), 
          name='customer_detail'),

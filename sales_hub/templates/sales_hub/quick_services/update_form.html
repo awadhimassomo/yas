@@ -1,0 +1,55 @@
+{% extends 'sales_hub/quick_services/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Update Quick Service Request{% endblock %}
+
+{% block header %}Update Quick Service Request #{{ service_request.id }}{% endblock %}
+
+{% block quick_services_content %}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+        <div class="mb-6">
+            <h4 class="text-md font-medium text-gray-900">Service Type</h4>
+            <p class="mt-1 text-sm text-gray-500">{{ service_request.get_service_type_display }}</p>
+        </div>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Customer</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ service_request.customer.name }} ({{ service_request.customer.phone }})</p>
+                </div>
+                
+                {{ form|crispy }}
+            </div>
+            
+            <div class="flex justify-between pt-5">
+                <div>
+                    <a href="{% url 'sales_hub:quick_service_detail' service_request.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </a>
+                    <a href="{% url 'sales_hub:quick_service_detail' service_request.id %}" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        View Details
+                    </a>
+                </div>
+                <div>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Update Request
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mt-6">
+    <a href="{% url 'sales_hub:customer_quick_services' service_request.customer.id %}" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800">
+        <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to {{ service_request.customer.name }}'s Quick Services
+    </a>
+</div>
+{% endblock %}
