@@ -7,6 +7,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from ..models import Customer, Interaction, Lead, Purchase, SupportRequest
+from public_site.models import ServiceRequest
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -47,6 +48,25 @@ def dashboard_stats(request):
     open_support = SupportRequest.objects.filter(status='open').count()
     support_7d = SupportRequest.objects.filter(created_at__date__gte=week_ago).count()
     
+    # Public Service Request stats
+    total_service_requests = ServiceRequest.objects.count()
+    pending_service_requests = ServiceRequest.objects.filter(status='pending').count()
+    service_requests_7d = ServiceRequest.objects.filter(created_at__date__gte=week_ago).count()
+    completed_today = ServiceRequest.objects.filter(
+        status='completed',
+        completed_at__date=today
+    ).count()
+    high_priority_requests = ServiceRequest.objects.filter(
+        lead_score__gte=70,
+        timeline='immediate',
+        status='pending'
+    ).count()
+    
+    # Service type breakdown
+    service_type_breakdown = ServiceRequest.objects.values('service_type').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
     data = {
         'customers': {
             'total': total_customers,
@@ -71,6 +91,14 @@ def dashboard_stats(request):
         'support': {
             'open': open_support,
             'new_7d': support_7d,
+        },
+        'service_requests': {
+            'total': total_service_requests,
+            'pending': pending_service_requests,
+            'new_7d': service_requests_7d,
+            'completed_today': completed_today,
+            'high_priority': high_priority_requests,
+            'by_type': list(service_type_breakdown),
         },
         'last_updated': timezone.now().isoformat()
     }
@@ -161,3 +189,64 @@ def recent_activity(request):
     
     # Return top 20 most recent activities
     return Response(activities[:20])
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def service_requests_list(request):
+    """
+    Get list of service requests from the public website with filtering options.
+    """
+    # Get query parameters
+    status_filter = request.GET.get('status', None)
+    service_type = request.GET.get('service_type', None)
+    priority = request.GET.get('priority', None)  # high, medium, low
+    limit = int(request.GET.get('limit', 20))
+    
+    # Base queryset
+    queryset = ServiceRequest.objects.all()
+    
+    # Apply filters
+    if status_filter:
+        queryset = queryset.filter(status=status_filter)
+    
+    if service_type:
+        queryset = queryset.filter(service_type=service_type)
+    
+    if priority:
+        if priority == 'high':
+            queryset = queryset.filter(lead_score__gte=70)
+        elif priority == 'medium':
+            queryset = queryset.filter(lead_score__gte=40, lead_score__lt=70)
+        elif priority == 'low':
+            queryset = queryset.filter(lead_score__lt=40)
+    
+    # Get the requests
+    service_requests = queryset.order_by('-created_at')[:limit]
+    
+    # Format the data
+    def format_service_request(sr):
+        return {
+            'id': sr.id,
+            'phone_number': sr.phone_number,
+            'service_type': sr.service_type,
+            'service_type_display': sr.get_service_type_display(),
+            'specific_service': sr.specific_service,
+            'specific_service_display': sr.get_specific_service_display(),
+            'timeline': sr.timeline,
+            'timeline_display': sr.get_timeline_display(),
+            'lead_score': sr.lead_score,
+            'status': sr.status,
+            'status_display': sr.get_status_display(),
+            'is_high_priority': sr.is_high_priority,
+            'assigned_to': sr.assigned_to.user.get_full_name() if sr.assigned_to else None,
+            'created_at': sr.created_at,
+            'updated_at': sr.updated_at,
+        }
+    
+    data = [format_service_request(sr) for sr in service_requests]
+    
+    return Response({
+        'count': queryset.count(),
+        'results': data
+    })

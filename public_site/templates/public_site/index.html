@@ -741,8 +741,20 @@
                 <button class="btn-primary" id="toStep4" style="display: none; margin-top: 20px;">Next</button>
             </div>
 
-            <!-- STEP 4: Lead Qualification -->
+            <!-- STEP 4: Get a Ticket -->
             <div class="step" id="step4">
+                <h3>Get a Ticket</h3>
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 4em; margin-bottom: 20px;">🎫</div>
+                    <p style="font-size: 1.2em; color: var(--e-global-color-secondary); margin-bottom: 30px;">
+                        Click below to get your service ticket
+                    </p>
+                    <button class="btn-primary" id="getTicketBtn">Get Ticket</button>
+                </div>
+            </div>
+
+            <!-- STEP 5: Lead Qualification -->
+            <div class="step" id="step5">
                 <h3>Almost Done!</h3>
                 <div class="form-group">
                     <label>When are you looking to solve this?</label>
@@ -891,6 +903,11 @@
                 });
             });
 
+            // Get Ticket button
+            document.getElementById('getTicketBtn').addEventListener('click', function() {
+                showStep(5);
+            });
+
             // Submit request
             document.getElementById('submitRequest').addEventListener('click', function() {
                 if (validateServiceData()) {
@@ -1016,7 +1033,7 @@
             
             nextButton.onclick = function() {
                 if (serviceData.specificService) {
-                    showStep(4);
+                    showStep(4);  // Go to Get Ticket step
                 } else {
                     alert('Please select a service');
                 }
@@ -1072,31 +1089,77 @@
         function submitLead(score) {
             console.log('Submitting lead:', { ...serviceData, score });
             
-            // If this is an appointment, activate the queue system
-            if (serviceData.specificService === 'appointment') {
-                activateQueueSystem();
-            }
+            // Prepare data for submission
+            const requestData = {
+                phoneNumber: serviceData.phoneNumber,
+                serviceType: serviceData.serviceType,
+                specificService: serviceData.specificService,
+                timeline: serviceData.timeline,
+                contactPreference: serviceData.contactPreference,
+                score: score
+            };
             
-            const serviceMode = document.querySelector('.service-mode');
-            const selectedService = Object.values(serviceOptions)
-                .flat()
-                .find(s => s.id === serviceData.specificService);
+            console.log('Request data:', requestData);
             
-            const serviceName = selectedService ? selectedService.name : 'your request';
-            
-            serviceMode.innerHTML = `
-                <div class="success-message">
-                    <h3>✅ Thank You!</h3>
-                    <p>Your <strong>${serviceName}</strong> request has been received.</p>
-                    <p><strong>Phone:</strong> ${serviceData.phoneNumber}</p>
-                    <p><strong>Priority Score:</strong> ${score}/100</p>
-                    ${serviceData.specificService === 'appointment' ? 
-                        '<p><strong>Your appointment has been scheduled!</strong></p>' : 
-                        '<p>We\'ll contact you shortly to assist with your request.</p>'
-                    }
-                    <button class="btn-primary" onclick="location.reload()">Back to Home</button>
-                </div>
-            `;
+            // Submit to backend
+            fetch('/api/submit-service-request/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                
+                // If this is an appointment, activate the queue system
+                if (serviceData.specificService === 'appointment') {
+                    activateQueueSystem();
+                }
+                
+                const serviceMode = document.querySelector('.service-mode');
+                const selectedService = Object.values(serviceOptions)
+                    .flat()
+                    .find(s => s.id === serviceData.specificService);
+                
+                const serviceName = selectedService ? selectedService.name : 'your request';
+                
+                serviceMode.innerHTML = `
+                    <div class="success-message">
+                        <h3>✅ Thank You!</h3>
+                        <p>Your <strong>${serviceName}</strong> request has been received.</p>
+                        <p><strong>Phone:</strong> ${serviceData.phoneNumber}</p>
+                        <p><strong>Priority Score:</strong> ${score}/100</p>
+                        <p><strong>Request ID:</strong> #${data.request_id || 'N/A'}</p>
+                        ${serviceData.specificService === 'appointment' ? 
+                            '<p><strong>Your appointment has been scheduled!</strong></p>' : 
+                            '<p>We\'ll contact you shortly to assist with your request.</p>'
+                        }
+                        <button class="btn-primary" onclick="location.reload()">Back to Home</button>
+                    </div>
+                `;
+            })
+            .catch((error) => {
+                console.error('Error submitting request:', error);
+                
+                const serviceMode = document.querySelector('.service-mode');
+                serviceMode.innerHTML = `
+                    <div class="success-message" style="border: 2px solid #ef4444;">
+                        <h3 style="color: #ef4444;">❌ Error</h3>
+                        <p>There was an error submitting your request.</p>
+                        <p style="color: #6b7280; font-size: 14px;">Error: ${error.message}</p>
+                        <p style="color: #6b7280; font-size: 14px;">Please check the console for more details or try again.</p>
+                        <button class="btn-primary" onclick="location.reload()">Try Again</button>
+                    </div>
+                `;
+            });
         }
 
         function activateQueueSystem() {

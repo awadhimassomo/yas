@@ -52,6 +52,14 @@ urlpatterns = [
          login_required(views.update_lead), 
          name='update_lead'),
     
+    # Service Requests
+    path('service-requests/', 
+         login_required(views.service_requests_view), 
+         name='service_requests'),
+    path('service-requests/<int:pk>/',
+         login_required(views.service_request_detail),
+         name='service_request_detail'),
+    
     # API endpoints for AJAX requests
     path('api/leads/<int:lead_id>/update/', 
          login_required(views.update_lead), 

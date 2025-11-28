@@ -193,6 +193,19 @@
                         <span class="nav-text">Interactions</span>
                     </a>
                     
+                    <a href="{% url 'sales_hub:service_requests' %}" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100 {% if active_tab == 'service_requests' %}active{% endif %}">
+                        <span class="nav-icon mr-3 text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                        <span class="nav-text">Service Requests</span>
+                        <span class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 hidden" id="pending-count">
+                            0
+                        </span>
+                    </a>
+                    
                     <a href="#" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100 {% if active_tab == 'reports' %}active{% endif %}">
                         <span class="nav-icon mr-3 text-gray-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -369,7 +382,31 @@
                     trigger: 'hover'
                 });
             });
+            
+            // Update pending service requests count
+            updatePendingCount();
+            setInterval(updatePendingCount, 30000); // Update every 30 seconds
         });
+        
+        function updatePendingCount() {
+            fetch('/api/dashboard/stats/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.service_requests && typeof data.service_requests.pending !== 'undefined') {
+                        const pendingCountEl = document.getElementById('pending-count');
+                        if (pendingCountEl) {
+                            const pending = data.service_requests.pending;
+                            pendingCountEl.textContent = pending;
+                            if (pending > 0) {
+                                pendingCountEl.classList.remove('hidden');
+                            } else {
+                                pendingCountEl.classList.add('hidden');
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching pending count:', error));
+        }
     </script>
     
     {% block extra_js %}{% endblock %}

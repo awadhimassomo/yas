@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
-from .dashboard_views import dashboard_stats, recent_activity
+from .dashboard_views import dashboard_stats, recent_activity, service_requests_list
 
 router = DefaultRouter()
 router.register(r'customers', views.CustomerViewSet)
@@ -19,4 +19,5 @@ urlpatterns = [
     # Additional API endpoints
     path('dashboard/stats/', dashboard_stats, name='dashboard-stats'),
     path('recent-activity/', recent_activity, name='recent-activity'),
+    path('service-requests/', service_requests_list, name='service-requests-list'),
 ]

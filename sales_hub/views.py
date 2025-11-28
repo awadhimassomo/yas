@@ -10,15 +10,27 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Agent, Customer, Lead, Feedback, Interaction
 from .quick_services import QuickServiceRequest
 from .forms import LeadUpdateForm, FeedbackForm, InteractionForm
+from public_site.models import ServiceRequest
+
+
+def get_agent_or_none(user):
+    """Return the agent profile for a user, creating one for superusers if needed."""
+    if hasattr(user, 'agent_profile'):
+        return user.agent_profile
+    if user.is_superuser:
+        agent, _ = Agent.objects.get_or_create(
+            user=user,
+            defaults={'phone': getattr(user, 'phone', '')}
+        )
+        return agent
+    return None
 
 
 @login_required
 def dashboard(request):
     """Agent dashboard showing assigned customers, leads, and recent activity."""
-    try:
-        agent = request.user.agent_profile
-    except Agent.DoesNotExist:
-        # If the user doesn't have an agent profile, redirect to an error page or create one
+    agent = get_agent_or_none(request.user)
+    if not agent:
         return render(request, 'sales_hub/agent_profile_required.html')
     
     # Get assigned customers
@@ -76,16 +88,11 @@ def dashboard(request):
         'agent': agent,
         'customers': customers,
         'leads': leads,
-        'recent_feedback': recent_feedback,
         'recent_interactions': recent_interactions,
+        'recent_feedback': recent_feedback,
         'lead_stats': lead_stats,
         'quick_services_stats': quick_services_stats,
         'active_tab': 'dashboard',
-        'interactions_with_followup': Interaction.objects.filter(
-            agent=agent,
-            follow_up_date__isnull=False,
-            follow_up_date__gte=timezone.now()
-        ).order_by('follow_up_date')[:5],
     }
     
     return render(request, 'sales_hub/dashboard.html', context)
@@ -354,3 +361,125 @@ def customer_list(request):
     }
     
     return render(request, 'sales_hub/customer_list.html', context)
+
+
+@login_required
+def service_requests_view(request):
+    """View for managing service requests from the public website."""
+    agent = get_agent_or_none(request.user)
+    if not agent:
+        return render(request, 'sales_hub/agent_profile_required.html')
+    
+    # Get filter parameters
+    status_filter = request.GET.get('status', '')
+    service_type_filter = request.GET.get('service_type', '')
+    priority_filter = request.GET.get('priority', '')
+    search_query = request.GET.get('q', '')
+    
+    # Base queryset
+    service_requests = ServiceRequest.objects.all()
+    
+    # Apply filters
+    if status_filter:
+        service_requests = service_requests.filter(status=status_filter)
+    
+    if service_type_filter:
+        service_requests = service_requests.filter(service_type=service_type_filter)
+    
+    if priority_filter:
+        if priority_filter == 'high':
+            service_requests = service_requests.filter(lead_score__gte=70)
+        elif priority_filter == 'medium':
+            service_requests = service_requests.filter(lead_score__gte=40, lead_score__lt=70)
+        elif priority_filter == 'low':
+            service_requests = service_requests.filter(lead_score__lt=40)
+    
+    if search_query:
+        service_requests = service_requests.filter(
+            Q(phone_number__icontains=search_query) |
+            Q(specific_service__icontains=search_query) |
+            Q(notes__icontains=search_query)
+        )
+    
+    # Order by created_at descending
+    service_requests = service_requests.order_by('-created_at')
+    
+    # Pagination
+    paginator = Paginator(service_requests, 20)
+    page = request.GET.get('page')
+    
+    try:
+        service_requests_page = paginator.page(page)
+    except PageNotAnInteger:
+        service_requests_page = paginator.page(1)
+    except EmptyPage:
+        service_requests_page = paginator.page(paginator.num_pages)
+    
+    # Get statistics
+    total_requests = ServiceRequest.objects.count()
+    pending_requests = ServiceRequest.objects.filter(status='pending').count()
+    high_priority_requests = ServiceRequest.objects.filter(
+        lead_score__gte=70,
+        timeline='immediate',
+        status='pending'
+    ).count()
+    
+    context = {
+        'service_requests': service_requests_page,
+        'total_requests': total_requests,
+        'pending_requests': pending_requests,
+        'high_priority_requests': high_priority_requests,
+        'status_filter': status_filter,
+        'service_type_filter': service_type_filter,
+        'priority_filter': priority_filter,
+        'search_query': search_query,
+        'active_tab': 'service_requests',
+    }
+    
+    return render(request, 'sales_hub/service_requests.html', context)
+
+
+@login_required
+def service_request_detail(request, pk):
+    """Detail view for a single service request with simple actions."""
+    agent = get_agent_or_none(request.user)
+    if not agent:
+        return render(request, 'sales_hub/agent_profile_required.html')
+    
+    service_request = get_object_or_404(ServiceRequest, pk=pk)
+    
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        assign_to_me = request.POST.get('assign_to_me') == 'on'
+        note = request.POST.get('note', '').strip()
+        
+        changed = False
+        
+        if new_status and new_status in dict(ServiceRequest.STATUS_CHOICES) and new_status != service_request.status:
+            service_request.status = new_status
+            changed = True
+        
+        if assign_to_me and service_request.assigned_to_id != agent.id:
+            service_request.assigned_to = agent
+            changed = True
+        
+        if note:
+            timestamp = timezone.now().strftime('%Y-%m-%d %H:%M')
+            prefix = f"[{timestamp}] {agent.user.get_full_name() or agent.user.username}: "
+            existing = service_request.notes or ''
+            service_request.notes = (existing + '\n' if existing else '') + prefix + note
+            changed = True
+        
+        if changed:
+            service_request.save()
+            messages.success(request, 'Service request updated successfully.')
+        else:
+            messages.info(request, 'No changes were made.')
+        
+        return redirect('sales_hub:service_request_detail', pk=service_request.pk)
+    
+    context = {
+        'service_request': service_request,
+        'active_tab': 'service_requests',
+    }
+    return render(request, 'sales_hub/service_request_detail.html', context)
