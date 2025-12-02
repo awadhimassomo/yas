@@ -5,12 +5,15 @@ from django.http import JsonResponse
 from django.db.models import Count, Q, Avg
 from django.utils import timezone
 from datetime import timedelta
+import base64
+import io
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Agent, Customer, Lead, Feedback, Interaction
 from .quick_services import QuickServiceRequest
 from .forms import LeadUpdateForm, FeedbackForm, InteractionForm
 from public_site.models import ServiceRequest
+import qrcode
 
 
 def get_agent_or_none(user):
@@ -84,6 +87,12 @@ def dashboard(request):
         'recent_requests': recent_quick_services,
     }
     
+    # Generate QR code for public self-service portal
+    qr = qrcode.make('https://www.yasbluerock.shop/')
+    buffer = io.BytesIO()
+    qr.save(buffer, format='PNG')
+    yas_qr_base64 = base64.b64encode(buffer.getvalue()).decode('ascii')
+
     context = {
         'agent': agent,
         'customers': customers,
@@ -92,6 +101,7 @@ def dashboard(request):
         'recent_feedback': recent_feedback,
         'lead_stats': lead_stats,
         'quick_services_stats': quick_services_stats,
+        'yas_qr_base64': yas_qr_base64,
         'active_tab': 'dashboard',
     }
     

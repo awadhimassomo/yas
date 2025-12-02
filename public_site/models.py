@@ -26,6 +26,9 @@ class ServiceRequest(models.Model):
         ('esim', 'eSIM Activation'),
         ('device-finance', 'Device Finance'),
         ('hbb', 'HBB Devices'),
+        ('fttx', 'FTTX Home Plan'),
+        ('dedicated-link', 'Dedicated Link'),
+        ('5g-unlimited-fwa', '5G Unlimited FWA'),
         # Support & Contact
         ('br-chatbot', 'BR Chatbot Assistance'),
         ('call', 'Call Support'),
@@ -35,6 +38,7 @@ class ServiceRequest(models.Model):
     
     TIMELINE_CHOICES = [
         ('immediate', 'Today/Right Now'),
+        ('in-store', 'I am at the store now (Get Ticket)'),
         ('this-week', 'Within this week'),
         ('this-month', 'Within this month'),
         ('just-browsing', 'Just gathering information'),

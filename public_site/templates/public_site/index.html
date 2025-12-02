@@ -594,7 +594,7 @@
             <a href="#" class="logo">YAS</a>
             <div class="main-nav">
                 <a href="#" class="nav-link">Mobile Plans</a>
-                <a href="#" class="nav-link">Home Plans</a>
+                <a href="#" class="nav-link" id="homePlansLink">Home Plans</a>
                 <a href="#" class="nav-link">Lifestyle</a>
                 <a href="#" class="nav-link">Devices</a>
             </div>
@@ -760,6 +760,7 @@
                     <label>When are you looking to solve this?</label>
                     <select class="form-control" id="timelineSelect">
                         <option value="immediate">Today/Right Now</option>
+                        <option value="in-store">I am at the store now (Get Ticket)</option>
                         <option value="this-week">Within this week</option>
                         <option value="this-month">Within this month</option>
                         <option value="just-browsing">Just gathering information</option>
@@ -812,7 +813,10 @@
                 { id: 'kinara', name: 'Kinara Packages', icon: '🎁', description: 'Special Kinara offers and deals' },
                 { id: 'esim', name: 'eSIM Activation', icon: '📲', description: 'Activate eSIM service' },
                 { id: 'device-finance', name: 'Device Finance', icon: '💳', description: 'Device financing options' },
-                { id: 'hbb', name: 'HBB Devices', icon: '🖥️', description: 'Home broadband devices' }
+                { id: 'hbb', name: 'HBB Devices', icon: '🖥️', description: 'Home broadband devices' },
+                { id: 'fttx', name: 'FTTX Home Plan', icon: '🌐', description: 'Fiber-to-the-home internet plans' },
+                { id: 'dedicated-link', name: 'Dedicated Link', icon: '🔗', description: 'Dedicated internet link for heavy usage' },
+                { id: '5g-unlimited-fwa', name: '5G Unlimited FWA', icon: '📶', description: 'Unlimited 5G Fixed Wireless Access' }
             ],
             'support-service': [
                 { id: 'br-chatbot', name: 'BR Chatbot', icon: '🤖', description: 'AI-powered assistance' },
@@ -835,6 +839,15 @@
                     startServiceFlow();
                 });
             });
+
+            // Home Plans nav link -> open Home Plan services under product-service
+            const homePlansLink = document.getElementById('homePlansLink');
+            if (homePlansLink) {
+                homePlansLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    startServiceFlow('product-service');
+                });
+            }
 
             // Service items in main dashboard
             document.querySelectorAll('.service-item').forEach(item => {
@@ -945,6 +958,11 @@
                 serviceData.serviceType = serviceType;
                 serviceData.specificService = specificService;
                 showStep(2);
+            } else if (serviceType && !specificService) {
+                // If only a category is provided (e.g., Home Plans -> product-service),
+                // go straight to phone number step for that category
+                serviceData.serviceType = serviceType;
+                showStep(2);
             } else {
                 showStep(1);
             }
@@ -1033,7 +1051,7 @@
             
             nextButton.onclick = function() {
                 if (serviceData.specificService) {
-                    showStep(4);  // Go to Get Ticket step
+                    showStep(5);  // Go directly to final step with Get Ticket option in dropdown
                 } else {
                     alert('Please select a service');
                 }
@@ -1119,8 +1137,8 @@
             .then(data => {
                 console.log('Success:', data);
                 
-                // If this is an appointment, activate the queue system
-                if (serviceData.specificService === 'appointment') {
+                // If this is an appointment or in-store help, activate the queue system
+                if (serviceData.specificService === 'appointment' || serviceData.timeline === 'in-store') {
                     activateQueueSystem();
                 }
                 

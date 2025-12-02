@@ -125,7 +125,7 @@
                 </div>
                 <div class="flex flex-col items-center gap-2">
                     <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow">
-                        <canvas id="yas-qr-canvas" width="180" height="180" aria-label="QR code linking to https://www.yasbluerock.shop/"></canvas>
+                        <img src="data:image/png;base64,{{ yas_qr_base64 }}" alt="QR code linking to https://www.yasbluerock.shop/" width="180" height="180" class="block" />
                     </div>
                     <p class="text-xs text-gray-500">Scan to visit yasbluerock.shop</p>
                 </div>
@@ -534,7 +534,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
     // Initialize any dashboard-specific JavaScript here
     document.addEventListener('DOMContentLoaded', function() {
@@ -544,8 +543,7 @@
         // Refresh every 30 seconds
         setInterval(loadServiceRequestStats, 30000);
 
-        // Render QR code and copy handler
-        renderYasQrCode();
+        // Copy handler for public site link
         setupYasCopyLink();
         
         // Tooltip initialization (only if tippy is available)
@@ -834,22 +832,6 @@
             if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
             if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
             return Math.floor(seconds / 86400) + 'd ago';
-        }
-
-        function renderYasQrCode() {
-            const canvas = document.getElementById('yas-qr-canvas');
-            if (!canvas || typeof QRCode === 'undefined') {
-                console.warn('QR code canvas or library missing');
-                return;
-            }
-            QRCode.toCanvas(canvas, 'https://www.yasbluerock.shop/', {
-                width: 180,
-                margin: 1
-            }, function (error) {
-                if (error) {
-                    console.error('Error generating QR code:', error);
-                }
-            });
         }
 
         function setupYasCopyLink() {
